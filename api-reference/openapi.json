@@ -1,94 +1,121 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "title": "SimplyBankroll Fantasy API",
+    "description": "Fantasy products are specified by the product parameter, a space-separated list of products that your application is requesting access to during LeagueSync API. Valid product names are\n- **league**: Read company directory and organization structure\n- **roster**: Read League Rosters\n- **player**: Read individual data, excluding income and employment data\n- **team**: Read payroll and contractor related payments by the company\n- **transaction**: Read detailed pay statements for each individual\n- **user**: Read detailed pay statements for each individual\n- **meta**: Read basic league data\n",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "michael@simplybankroll.com"
     },
-    "version": "1.0.0"
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0-oas3"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.leaguesync.dev"
     }
   ],
-  "security": [
+  "tags": [
     {
-      "bearerAuth": []
+      "name": "league",
+      "description": "Access Metadata about leagues the user is a part of on linked platform",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "http://swagger.io"
+      }
+    },
+    {
+      "name": "roster",
+      "description": "Access metadata associated with your Roster"
     }
   ],
   "paths": {
-    "/plants": {
+    "/league/findAllLeagues": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": [
+          "league"
+        ],
+        "summary": "Returns all leagues for a given user.",
+        "operationId": "findAllLeagues",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "X-Auth-Token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            }
+          },
+          {
+            "name": "sport",
+            "in": "query",
+            "description": "Filter results to only include the specified sport",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "default": "available",
+                "enum": [
+                  "baseball",
+                  "football",
+                  "basketball"
+                ]
+              }
+            }
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "description": "Filter results to only include the specified season",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "enum": [
+                  2017,
+                  2018,
+                  2019,
+                  2020,
+                  2021
+                ]
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plant"
+                    "$ref": "#/components/schemas/League"
                   }
                 }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
+              },
+              "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/League"
+                  }
                 }
               }
             }
@@ -96,99 +123,881 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/league/{league_id}": {
+      "get": {
+        "tags": [
+          "league"
+        ],
+        "summary": "Find League by league_id",
+        "description": "Returns a single league",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
             "required": true,
+            "style": "simple",
+            "explode": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/League"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/league/settings/{league_id}": {
+      "get": {
+        "tags": [
+          "league"
+        ],
+        "summary": "Find league settings by league_id",
+        "description": "Returns a single league",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/League"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/league/standings/{league_id}": {
+      "get": {
+        "tags": [
+          "league"
+        ],
+        "summary": "Find league standings by league_id",
+        "description": "Returns current league standings",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Standings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/roster/getAllRosters/{league_id}": {
+      "get": {
+        "tags": [
+          "roster"
+        ],
+        "summary": "Get all rosters in a league",
+        "description": "Returns all team rosters in a league specified by {league_id}",
+        "operationId": "getInventory",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "user-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamRoster"
+                  }
                 }
               }
             }
           }
         }
+      }
+    },
+    "/roster/getRoster/{league_id}/{roster_id}": {
+      "get": {
+        "tags": [
+          "roster"
+        ],
+        "summary": "Returns a roster by league_id and roster_id",
+        "description": "Returns a single roster",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "user-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "roster_id",
+            "in": "path",
+            "description": "roster_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeamRoster"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/players/getAllRostered/{league_id}/player_id": {
+      "get": {
+        "tags": [
+          "players"
+        ],
+        "summary": "Get all Owned Players",
+        "description": "Returns a json object of all owned players. The Keys are player_id",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/League"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/players/getAllRostered/{league_id}/names": {
+      "get": {
+        "tags": [
+          "players"
+        ],
+        "summary": "Get all Owned Players",
+        "description": "Returns a json object of all owned players. The Keys are full_names of the players",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/League"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/players/{league_id}/searchPlayer/name/{player_name}": {
+      "get": {
+        "tags": [
+          "players"
+        ],
+        "summary": "Get the status of a single player",
+        "description": "Returns the player specified by {player_name}",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "player_name",
+            "in": "path",
+            "description": "player_name to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Player"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/players/{league_id}/searchPlayer/player_id/{player_id}": {
+      "get": {
+        "tags": [
+          "players"
+        ],
+        "summary": "Get the status of a single player",
+        "description": "Returns the player specified by {player_id}",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "player_id",
+            "in": "path",
+            "description": "player_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Player"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/transactions/{league_id}/": {
+      "get": {
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Get all transactions",
+        "description": "Returns all transactions in the league",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transactions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/matchups/{league_id}/{date_interval}/": {
+      "get": {
+        "tags": [
+          "matchups"
+        ],
+        "summary": "Get all matchups in a given week",
+        "description": "Returns all matchups in the league during the date_interval specified",
+        "parameters": [
+          {
+            "name": "auth_token",
+            "in": "header",
+            "description": "User-platform auth_token supplied by LeagueSync API",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "league_id",
+            "in": "path",
+            "description": "league_id to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date_interval",
+            "in": "path",
+            "description": "date_interval to filter by",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/League"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid league_id value"
+          }
+        },
+        "deprecated": false
       }
     }
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "Roster": {
         "required": [
-          "name"
+          "league_id",
+          "name",
+          "platform"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
+          "league_id": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "example": 598254394714169300
           },
-          "message": {
-            "type": "string"
+          "name": {
+            "type": "string",
+            "example": "Sleeperbot Dynasty"
+          },
+          "num_teams": {
+            "type": "integer",
+            "format": "int64",
+            "example": 12
+          },
+          "sport": {
+            "type": "string",
+            "example": "football"
+          },
+          "league_url": {
+            "type": "string",
+            "example": "https://sleeper.app/leagues/598254394714169344"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2020
+          },
+          "league_avatar": {
+            "type": "string",
+            "example": "http://sleepercdn.com/avatars/efaefa889ae24046a53265a3c71b8b64"
+          }
+        },
+        "xml": {
+          "name": "Roster"
+        }
+      },
+      "League": {
+        "required": [
+          "league_id",
+          "name",
+          "platform"
+        ],
+        "type": "object",
+        "properties": {
+          "league_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 598254394714169300
+          },
+          "name": {
+            "type": "string",
+            "example": "Sleeperbot Dynasty"
+          },
+          "num_teams": {
+            "type": "integer",
+            "format": "int64",
+            "example": 12
+          },
+          "sport": {
+            "type": "string",
+            "example": "football"
+          },
+          "league_url": {
+            "type": "string",
+            "example": "https://sleeper.app/leagues/598254394714169344"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2020
+          },
+          "league_avatar": {
+            "type": "string",
+            "example": "http://sleepercdn.com/avatars/efaefa889ae24046a53265a3c71b8b64"
+          }
+        },
+        "xml": {
+          "name": "League"
+        }
+      },
+      "Standings": {
+        "required": [
+          "league_id",
+          "platform",
+          "team_id"
+        ],
+        "type": "object",
+        "properties": {
+          "league_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 598254394714169300
+          },
+          "team_id": {
+            "type": "string",
+            "example": "1"
+          },
+          "num_teams": {
+            "type": "integer",
+            "format": "int64",
+            "example": 12
+          },
+          "sport": {
+            "type": "string",
+            "example": "football"
+          },
+          "league_url": {
+            "type": "string",
+            "example": "https://sleeper.app/leagues/598254394714169344"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2020
+          },
+          "name": {
+            "type": "string",
+            "example": "Jon's Amazing Team"
+          },
+          "rank": {
+            "type": "integer",
+            "example": 4
+          },
+          "outcomes_wins": {
+            "type": "integer",
+            "example": 4
+          },
+          "outcomes_losses": {
+            "type": "integer",
+            "example": 1
+          },
+          "outcomes_ties": {
+            "type": "integer",
+            "example": 2
+          },
+          "outcomes_win_percentage": {
+            "type": "number",
+            "example": 0.511
+          },
+          "games_back": {
+            "type": "number",
+            "example": 14.5
+          }
+        },
+        "xml": {
+          "name": "League"
+        }
+      },
+      "TeamRoster": {
+        "required": [
+          "league_id",
+          "players",
+          "roster_id"
+        ],
+        "type": "object",
+        "properties": {
+          "league_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 598254394714169300
+          },
+          "roster_id": {
+            "type": "string",
+            "example": "1"
+          },
+          "owned_player": {
+            "type": "array",
+            "example": 12,
+            "items": {
+              "$ref": "#/components/schemas/Player"
+            }
+          },
+          "sport": {
+            "type": "string",
+            "example": "football"
+          },
+          "season": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2020
+          }
+        },
+        "xml": {
+          "name": "TeamRoster"
+        }
+      },
+      "Player": {
+        "type": "object",
+        "properties": {
+          "player_id": {
+            "type": "string",
+            "example": "3086"
+          },
+          "position": {
+            "type": "string",
+            "example": "QB"
+          },
+          "sport": {
+            "type": "string",
+            "example": "football"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "Tom"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Brady"
+          },
+          "full_name": {
+            "type": "string",
+            "example": "Tom Brady"
+          },
+          "irl_team": {
+            "type": "string",
+            "example": "TB"
+          },
+          "fantasy_team_roster_id": {
+            "type": "string",
+            "example": "2"
+          },
+          "uniform_number": {
+            "type": "string",
+            "example": "12"
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      },
+      "Transactions": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "example": "378.l.71943.tr.901"
+          },
+          "transaction_type": {
+            "type": "string",
+            "example": "add"
+          },
+          "position": {
+            "type": "string",
+            "example": "QB"
+          },
+          "timestamp": {
+            "type": "integer",
+            "example": 1538318599
+          },
+          "first_name": {
+            "type": "string",
+            "example": "Tom"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Brady"
+          },
+          "full_name": {
+            "type": "string",
+            "example": "Tom Brady"
+          },
+          "irl_team": {
+            "type": "string",
+            "example": "TB"
+          },
+          "source_team_key": {
+            "type": "string"
+          },
+          "source_team_name": {
+            "type": "string",
+            "example": "waivers"
+          },
+          "destination_team_key": {
+            "type": "string",
+            "example": "2"
+          },
+          "destination_team_name": {
+            "type": "string",
+            "example": "My Great Fantasy Team"
+          },
+          "status": {
+            "type": "string",
+            "example": "successful"
+          }
+        }
       }
     }
   }

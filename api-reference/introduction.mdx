@@ -10,7 +10,15 @@ description: 'Example section for showcasing API endpoints'
 
 ## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+Fantasy products are specified by the product parameter, a space-separated list of products that your application is requesting access to during LeagueSync API. Valid product names are
+
+ - league: Read company directory and organization structure
+ - roster: Read League Rosters
+ - player: Read individual data, excluding income and employment data
+ - team: Read payroll and contractor related payments by the company
+ - transaction: Read detailed pay statements for each individual
+ - user: Read detailed pay statements for each individual
+ - meta: Read basic league data
 
 <Card
   title="Plant Store Endpoints"
@@ -22,12 +30,8 @@ There are two ways to build API documentation: [OpenAPI](https://mintlify.com/do
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints are authenticated using the following header
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+  X-Auth-Token: {"platform": "<platform>", "token": "<access_token>"}
 ```
