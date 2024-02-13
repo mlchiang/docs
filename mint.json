@@ -54,11 +54,46 @@
       ]
     },
     {
+      "group": "Status",
+      "pages": [
+        "api-reference/status/health_check"
+      ]
+    },
+    {
       "group": "League",
       "pages": [
         "api-reference/league/findAllLeagues",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/league/{league_id}",
+        "api-reference/league/settings/{league_id}",
+        "api-reference/league/standings/{league_id}"
+      ]
+    },
+    {
+      "group": "Roster",
+      "pages": [
+        "api-reference/roster/getAllRosters/{league_id}",
+        "api-reference/roster/getRoster/{league_id}/{roster_id}"
+      ]
+    },
+    {
+      "group": "Players",
+      "pages": [
+        "api-reference/players/getAllRostered/{league_id}/player_id",
+        "api-reference/players/getAllRostered/{league_id}/names",
+        "api-reference/players/{league_id}/searchPlayer/name/{player_name}",
+        "api-reference/players/{league_id}/searchPlayer/player_id/{player_id}"
+      ]
+    },
+    {
+      "group": "Transactions",
+      "pages": [
+        "api-reference/transactions/{league_id}"
+      ]
+    },
+    {
+      "group": "Matchups",
+      "pages": [
+        "api-reference/matchups/{league_id}/{date_interval}"
       ]
     }
   ],
